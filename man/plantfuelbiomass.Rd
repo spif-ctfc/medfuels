@@ -4,17 +4,19 @@
 \alias{plantfuelbiomass}
 \title{Plant fuel biomass}
 \usage{
-plantfuelbiomass(x, type = "total", agg = "none", excludeSSP = TRUE,
-  customParams = NULL, na.rm = TRUE)
+plantfuelbiomass(x, type = "total", allometric = TRUE, excludeSSP = TRUE,
+  agg = "none", customParams = NULL, na.rm = TRUE)
 }
 \arguments{
 \item{x}{data frame with columns 'plot', 'species', 'H' (height in cm), 'D1' and 'D2' (in cm)}
 
-\item{type}{either 'total'  (total fuel) or 'fine' (fine fuels)}
+\item{type}{either 'total'  (total fuel) of 'fine' (fine fuels)}
 
-\item{agg}{aggregation of results. Either 'none', 'species' or 'plot'}
+\item{allometric}{wether to use allometric equations or bulk density estimates}
 
 \item{excludeSSP}{excludes subspecies information for species matching}
+
+\item{agg}{aggregation of results. Either 'none', 'species' or 'plot'}
 
 \item{customParams}{custom allometry parameter table (for species not in default params)}
 

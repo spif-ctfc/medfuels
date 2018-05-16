@@ -4,9 +4,10 @@
 #'
 #' @param x data frame with columns 'plot', 'species', 'H' (mean height in cm), 'C' (cover in percent)
 #' @param type either 'total'  (total fuel) or 'fine' (fine fuels)
+#' @param allometric wether to use allometric equations or bulk density estimates
+#' @param excludeSSP excludes subspecies information for species matching
 #' @param agg aggregation of results. Either 'none' or 'plot'
 #' @param customParams custom allometry parameter table (for species not in default params)
-#' @param excludeSSP excludes subspecies information for species matching
 #' @param na.rm whether to exclude missing values when aggregating loading
 #'
 #' @return a vector with loading values (kg/m2)
@@ -20,7 +21,8 @@
 #' x = data.frame(plot, species, H, C)
 #'
 #' speciesfuelloading(x)
-speciesfuelloading <- function(x, type= "total", agg = "none", excludeSSP = TRUE, customParams = NULL, na.rm = TRUE) {
+speciesfuelloading <- function(x, type= "total", allometric = TRUE, excludeSSP = TRUE,
+                               agg = "none", customParams = NULL, na.rm = TRUE) {
   type = match.arg(type, c("total","fine"))
   agg = match.arg(agg, c("none", "species", "plot"))
   x = as.data.frame(x)
@@ -45,22 +47,26 @@ speciesfuelloading <- function(x, type= "total", agg = "none", excludeSSP = TRUE
 
   sp_list = row.names(sp_params)
   nrec = nrow(x)
-  area = rep(NA,nrec)
-  for(i in 1:nrec) {
-    if(sp[i] %in% sp_list) {
-      area[i] = sp_params[sp[i],"a"]*hm[i]^2 # area in cm2
-    } else {
-      gr = .getSpeciesGroup(sp[i])
-      if(!is.na(gr)) {
-        area[i] = group_params[gr,"a"]*hm[i]^2
+  if(allometric) {
+    area = rep(NA,nrec)
+    for(i in 1:nrec) {
+      if(sp[i] %in% sp_list) {
+        area[i] = sp_params[sp[i],"a"]*hm[i]^2 # area in cm2
       } else {
-        warning(paste0("Species '", sp[i],"' not found in parameter file for area!"))
+        gr = .getSpeciesGroup(sp[i])
+        if(!is.na(gr)) {
+          area[i] = group_params[gr,"a"]*hm[i]^2
+        } else {
+          warning(paste0("Species '", sp[i],"' not found in parameter file for area!"))
+        }
       }
     }
-  }
 
-  N = x$C*100/area #Density in ind/m2
-  vol = (area*hm)/(10^6) #vol in m3
+    N = x$C*100/area #Density in ind/m2
+    vol = (area*hm)/(10^6) #vol in m3
+  } else {
+    vol = (x$C/100)*(hm/100) #vol in m3/m2
+  }
 
   if(type=="total") {
     data("sp_params_total")
@@ -78,18 +84,21 @@ speciesfuelloading <- function(x, type= "total", agg = "none", excludeSSP = TRUE
   weight = rep(NA,nrec)
   for(i in 1:nrec) {
     if(sp[i] %in% sp_list) {
-      weight[i] = sp_params[sp[i],"a"]*vol[i]^sp_params[sp[i],"b"]
+      if(allometric) weight[i] = sp_params[sp[i],"a"]*vol[i]^sp_params[sp[i],"b"]
+      else weight[i] = sp_params[sp[i],"BD"]*vol[i]
     } else {
       gr = .getSpeciesGroup(sp[i])
       if(!is.na(gr)) {
-        weight[i] = group_params[gr,"a"]*vol[i]^group_params[gr,"b"]
+        if(allometric) weight[i] = group_params[gr,"a"]*vol[i]^group_params[gr,"b"]
+        else weight[i] = group_params[gr,"BD"]*vol[i]
       } else {
         warning(paste0("Species '", sp[i],"' not found in parameter file for biomass!"))
       }
     }
   }
 
-  load = weight*N
+  if(allometric) load = weight*N
+  else load = weight
 
   if(agg=="plot") {
     load = tapply(load, x$plot, FUN = sum, na.rm=na.rm)
