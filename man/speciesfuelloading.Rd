@@ -4,8 +4,8 @@
 \alias{speciesfuelloading}
 \title{Species fuel loading}
 \usage{
-speciesfuelloading(x, type = "total", agg = "none", customParams = NULL,
-  na.rm = TRUE)
+speciesfuelloading(x, type = "total", agg = "none", excludeSSP = TRUE,
+  customParams = NULL, na.rm = TRUE)
 }
 \arguments{
 \item{x}{data frame with columns 'plot', 'species', 'H' (mean height in cm), 'C' (cover in percent)}
@@ -13,6 +13,8 @@ speciesfuelloading(x, type = "total", agg = "none", customParams = NULL,
 \item{type}{either 'total'  (total fuel) or 'fine' (fine fuels)}
 
 \item{agg}{aggregation of results. Either 'none' or 'plot'}
+
+\item{excludeSSP}{excludes subspecies information for species matching}
 
 \item{customParams}{custom allometry parameter table (for species not in default params)}
 

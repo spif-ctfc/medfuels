@@ -4,15 +4,17 @@
 \alias{plantfuelbiomass}
 \title{Plant fuel biomass}
 \usage{
-plantfuelbiomass(x, type = "total", agg = "none", customParams = NULL,
-  na.rm = TRUE)
+plantfuelbiomass(x, type = "total", agg = "none", excludeSSP = TRUE,
+  customParams = NULL, na.rm = TRUE)
 }
 \arguments{
-\item{x}{data frame with columns 'plot', 'individual', 'species', 'H' (height in cm), 'D1' and 'D2' (in cm)}
+\item{x}{data frame with columns 'plot', 'species', 'H' (height in cm), 'D1' and 'D2' (in cm)}
 
 \item{type}{either 'total'  (total fuel) or 'fine' (fine fuels)}
 
 \item{agg}{aggregation of results. Either 'none', 'species' or 'plot'}
+
+\item{excludeSSP}{excludes subspecies information for species matching}
 
 \item{customParams}{custom allometry parameter table (for species not in default params)}
 
@@ -26,12 +28,11 @@ Calculates dry weight (biomass, in kg) of total or fine fuels corresponding to p
 }
 \examples{
 plot = c(1,1,2,2,2)
-individual = c(1,2,1,2,3)
 species = c("Erica arborea","Cistus albidus", "Erica arborea", "Chamaerops humilis", "Unknown")
 H = c(60,200,100,250,100)
 D1 = c(10,100,30, 50,25)
 D2 = D1
-x = data.frame(plot, individual, species, H, D1, D2)
+x = data.frame(plot, species, H, D1, D2)
 
 plantfuelbiomass(x)
 }

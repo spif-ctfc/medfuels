@@ -2,9 +2,10 @@
 #'
 #' Calculates dry weight (biomass, in kg) of total or fine fuels corresponding to plant data
 #'
-#' @param x data frame with columns 'plot', 'individual', 'species', 'H' (height in cm), 'D1' and 'D2' (in cm)
+#' @param x data frame with columns 'plot', 'species', 'H' (height in cm), 'D1' and 'D2' (in cm)
 #' @param type either 'total'  (total fuel) or 'fine' (fine fuels)
 #' @param agg aggregation of results. Either 'none', 'species' or 'plot'
+#' @param excludeSSP excludes subspecies information for species matching
 #' @param customParams custom allometry parameter table (for species not in default params)
 #' @param na.rm whether to exclude missing values when aggregating biomass
 #'
@@ -13,22 +14,20 @@
 #'
 #' @examples
 #' plot = c(1,1,2,2,2)
-#' individual = c(1,2,1,2,3)
 #' species = c("Erica arborea","Cistus albidus", "Erica arborea", "Chamaerops humilis", "Unknown")
 #' H = c(60,200,100,250,100)
 #' D1 = c(10,100,30, 50,25)
 #' D2 = D1
-#' x = data.frame(plot, individual, species, H, D1, D2)
+#' x = data.frame(plot, species, H, D1, D2)
 #'
 #' plantfuelbiomass(x)
 
-plantfuelbiomass <- function(x, type= "total", agg = "none", customParams = NULL, na.rm = TRUE) {
+plantfuelbiomass <- function(x, type= "total", agg = "none", excludeSSP = TRUE, customParams = NULL, na.rm = TRUE) {
   type = match.arg(type, c("total","fine"))
   agg = match.arg(agg, c("none", "species", "plot"))
   x = as.data.frame(x)
   vars = names(x)
   if(!("plot" %in% vars)) stop("Variable 'plot' needed in 'x'")
-  if(!("individual" %in% vars)) stop("Variable 'individual' needed in 'x'")
   if(!("species" %in% vars)) stop("Variable 'species' needed in 'x'")
   if(!("H" %in% vars)) stop("Variable 'H' needed in 'x'")
   if(!("D1" %in% vars)) stop("Variable 'D1' needed in 'x'")
@@ -37,6 +36,12 @@ plantfuelbiomass <- function(x, type= "total", agg = "none", customParams = NULL
   d1 = x$D1/100
   d2 = x$D2/100
   vol = h*pi*(d1/2)*(d2/2)
+
+  sp = as.character(x$species)
+  if(excludeSSP) {
+    s = strsplit(as.character(sp), " ")
+    sp = unlist(lapply(s, function(x) {paste(x[1:min(2,length(x))], collapse=" ")}))
+  }
 
   if(type=="total") {
     data("sp_params_total")
@@ -54,15 +59,14 @@ plantfuelbiomass <- function(x, type= "total", agg = "none", customParams = NULL
   nind = nrow(x)
   weight = rep(NA,nind)
   for(i in 1:nind) {
-    sp = as.character(x$species[i])
-    if(sp %in% sp_list) {
-      weight[i] = sp_params[sp,"a"]*vol[i]^sp_params[sp,"b"]
+    if(sp[i] %in% sp_list) {
+      weight[i] = sp_params[sp[i],"a"]*vol[i]^sp_params[sp[i],"b"]
     } else {
-      gr = .getSpeciesGroup(sp)
+      gr = .getSpeciesGroup(sp[i])
       if(!is.na(gr)) {
         weight[i] = group_params[gr,"a"]*vol[i]^group_params[gr,"b"]
       } else {
-        warning(paste0("Species '", sp,"' not found in parameter file for biomass!"))
+        warning(paste0("Species '", sp[i],"' not found in parameter file for biomass!"))
       }
     }
   }

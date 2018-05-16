@@ -6,6 +6,7 @@
 #' @param type either 'total'  (total fuel) or 'fine' (fine fuels)
 #' @param agg aggregation of results. Either 'none' or 'plot'
 #' @param customParams custom allometry parameter table (for species not in default params)
+#' @param excludeSSP excludes subspecies information for species matching
 #' @param na.rm whether to exclude missing values when aggregating loading
 #'
 #' @return a vector with loading values (kg/m2)
@@ -19,7 +20,7 @@
 #' x = data.frame(plot, species, H, C)
 #'
 #' speciesfuelloading(x)
-speciesfuelloading <- function(x, type= "total", agg = "none", customParams = NULL, na.rm = TRUE) {
+speciesfuelloading <- function(x, type= "total", agg = "none", excludeSSP = TRUE, customParams = NULL, na.rm = TRUE) {
   type = match.arg(type, c("total","fine"))
   agg = match.arg(agg, c("none", "species", "plot"))
   x = as.data.frame(x)
@@ -28,6 +29,12 @@ speciesfuelloading <- function(x, type= "total", agg = "none", customParams = NU
   if(!("species" %in% vars)) stop("Variable 'species' needed in 'x'")
   if(!("H" %in% vars)) stop("Variable 'H' needed in 'x'")
   if(!("C" %in% vars)) stop("Variable 'C' needed in 'x'")
+
+  sp = as.character(x$species)
+  if(excludeSSP) {
+    s = strsplit(as.character(sp), " ")
+    sp = unlist(lapply(s, function(x) {paste(x[1:min(2,length(x))], collapse=" ")}))
+  }
 
   hm = x$H #hm in cm
 
@@ -40,15 +47,14 @@ speciesfuelloading <- function(x, type= "total", agg = "none", customParams = NU
   nrec = nrow(x)
   area = rep(NA,nrec)
   for(i in 1:nrec) {
-    sp = as.character(x$species[i])
-    if(sp %in% sp_list) {
-      area[i] = sp_params[sp,"a"]*hm[i]^2 # area in cm2
+    if(sp[i] %in% sp_list) {
+      area[i] = sp_params[sp[i],"a"]*hm[i]^2 # area in cm2
     } else {
-      gr = .getSpeciesGroup(sp)
+      gr = .getSpeciesGroup(sp[i])
       if(!is.na(gr)) {
         area[i] = group_params[gr,"a"]*hm[i]^2
       } else {
-        warning(paste0("Species '", sp,"' not found in parameter file for area!"))
+        warning(paste0("Species '", sp[i],"' not found in parameter file for area!"))
       }
     }
   }
@@ -71,15 +77,14 @@ speciesfuelloading <- function(x, type= "total", agg = "none", customParams = NU
   sp_list = row.names(sp_params)
   weight = rep(NA,nrec)
   for(i in 1:nrec) {
-    sp = as.character(x$species[i])
-    if(sp %in% sp_list) {
-      weight[i] = sp_params[sp,"a"]*vol[i]^sp_params[sp,"b"]
+    if(sp[i] %in% sp_list) {
+      weight[i] = sp_params[sp[i],"a"]*vol[i]^sp_params[sp[i],"b"]
     } else {
-      gr = .getSpeciesGroup(sp)
+      gr = .getSpeciesGroup(sp[i])
       if(!is.na(gr)) {
         weight[i] = group_params[gr,"a"]*vol[i]^group_params[gr,"b"]
       } else {
-        warning(paste0("Species '", sp,"' not found in parameter file for biomass!"))
+        warning(paste0("Species '", sp[i],"' not found in parameter file for biomass!"))
       }
     }
   }
