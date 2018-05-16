@@ -17,6 +17,8 @@
 #' H = c(60,200,100,250,100)
 #' C = c(10,100,30, 50,25)
 #' x = data.frame(plot, species, H, C)
+#'
+#' speciesfuelloading(x)
 speciesfuelloading <- function(x, type= "total", agg = "none", customParams = NULL, na.rm = TRUE) {
   type = match.arg(type, c("total","fine"))
   agg = match.arg(agg, c("none", "species", "plot"))

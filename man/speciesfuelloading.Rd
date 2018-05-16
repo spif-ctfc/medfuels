@@ -30,4 +30,6 @@ species = c("Erica arborea","Cistus albidus", "Erica arborea", "Chamaerops humil
 H = c(60,200,100,250,100)
 C = c(10,100,30, 50,25)
 x = data.frame(plot, species, H, C)
+
+speciesfuelloading(x)
 }
