@@ -52,29 +52,29 @@ plantfuelbiomass <- function(x, type= "total", agg = "none", customParams = NULL
 
   sp_list = row.names(sp_params)
   nind = nrow(x)
-  load = rep(NA,nind)
+  weight = rep(NA,nind)
   for(i in 1:nind) {
     sp = as.character(x$species[i])
     if(sp %in% sp_list) {
-      load[i] = sp_params[sp,"a"]*vol[i]^sp_params[sp,"b"]
+      weight[i] = sp_params[sp,"a"]*vol[i]^sp_params[sp,"b"]
     } else {
       gr = .getSpeciesGroup(sp)
       if(!is.na(gr)) {
-        load[i] = group_params[gr,"a"]*vol[i]^group_params[gr,"b"]
+        weight[i] = group_params[gr,"a"]*vol[i]^group_params[gr,"b"]
       } else {
-        warning(paste0("Species '", sp,"' not found in parameter file!"))
+        warning(paste0("Species '", sp,"' not found in parameter file for biomass!"))
       }
     }
   }
 
   if(agg=="species") {
-    load = tapply(load, x$species, FUN = sum, na.rm=na.rm)
+    weight = tapply(weight, x$species, FUN = sum, na.rm=na.rm)
   } else if(agg=="plot") {
-    load = tapply(load, x$plot, FUN = sum, na.rm=na.rm)
+    weight = tapply(weight, x$plot, FUN = sum, na.rm=na.rm)
   } else {
-    names(load) = row.names(x)
+    names(weight) = row.names(x)
   }
-  return(load)
+  return(weight)
 }
 
 .getSpeciesGroup<-function(sp) {
