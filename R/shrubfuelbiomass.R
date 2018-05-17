@@ -58,12 +58,18 @@ shrubfuelbiomass <- function(x, type= "total",  allometric = TRUE, excludeSSP = 
   weight = rep(NA,nind)
   for(i in 1:nind) {
     if(sp[i] %in% sp_list) {
-      if(allometric) weight[i] = sp_params[sp[i],"a"]*vol[i]^sp_params[sp[i],"b"]
+      if(allometric) {
+        if(vol[i] > sp_params[sp[i],"maxVol"]) warning(paste0("Volume '", vol[i],"' outside the calibration range for '", sp[i],"'"))
+        weight[i] = sp_params[sp[i],"a"]*vol[i]^sp_params[sp[i],"b"]
+      }
       else weight[i] = sp_params[sp[i],"BD"]*vol[i]
     } else {
       gr = .getSpeciesGroup(sp[i])
       if(!is.na(gr)) {
-        if(allometric) weight[i] = group_params[gr,"a"]*vol[i]^group_params[gr,"b"]
+        if(allometric) {
+          if(vol[i] > group_params[gr,"maxVol"]) warning(paste0("Volume '", vol[i],"' outside the calibration range for '", gr[i],"'"))
+          weight[i] = group_params[gr,"a"]*vol[i]^group_params[gr,"b"]
+        }
         else weight[i] = group_params[gr,"BD"]*vol[i]
       } else {
         warning(paste0("Species '", sp[i],"' not found in parameter file for biomass!"))

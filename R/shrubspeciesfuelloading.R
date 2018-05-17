@@ -49,10 +49,12 @@ shrubspeciesfuelloading <- function(x, type= "total", allometric = TRUE, exclude
     area = rep(NA,nrec)
     for(i in 1:nrec) {
       if(sp[i] %in% sp_list) {
+        if(hm[i] > sp_params[sp[i],"maxH"]) warning(paste0("Height '", hm[i],"' outside the calibration range for '", sp[i],"'"))
         area[i] = sp_params[sp[i],"a"]*hm[i]^2 # area in cm2
       } else {
         gr = .getSpeciesGroup(sp[i])
         if(!is.na(gr)) {
+          if(hm[i] > group_params[gr,"maxH"]) warning(paste0("Height '", hm[i],"' outside the calibration range for '", gr,"'"))
           area[i] = group_params[gr,"a"]*hm[i]^2
         } else {
           warning(paste0("Species '", sp[i],"' not found in parameter file for area!"))
@@ -78,12 +80,18 @@ shrubspeciesfuelloading <- function(x, type= "total", allometric = TRUE, exclude
   weight = rep(NA,nrec)
   for(i in 1:nrec) {
     if(sp[i] %in% sp_list) {
-      if(allometric) weight[i] = sp_params[sp[i],"a"]*vol[i]^sp_params[sp[i],"b"]
+      if(allometric) {
+        if(vol[i] > sp_params[sp[i],"maxVol"]) warning(paste0("Volume '", vol[i],"' outside the calibration range for '", sp[i],"'"))
+        weight[i] = sp_params[sp[i],"a"]*vol[i]^sp_params[sp[i],"b"]
+      }
       else weight[i] = sp_params[sp[i],"BD"]*vol[i]
     } else {
       gr = .getSpeciesGroup(sp[i])
       if(!is.na(gr)) {
-        if(allometric) weight[i] = group_params[gr,"a"]*vol[i]^group_params[gr,"b"]
+        if(allometric) {
+          if(vol[i] > group_params[gr,"maxVol"]) warning(paste0("Volume '", vol[i],"' outside the calibration range for '", gr[i],"'"))
+          weight[i] = group_params[gr,"a"]*vol[i]^group_params[gr,"b"]
+        }
         else weight[i] = group_params[gr,"BD"]*vol[i]
       } else {
         warning(paste0("Species '", sp[i],"' not found in parameter file for biomass!"))
