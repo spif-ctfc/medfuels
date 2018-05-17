@@ -6,7 +6,7 @@
 #' @param type either 'total'  (total fuel) of 'fine' (fine fuels)
 #' @param allometric wether to use allometric equations or bulk density estimates
 #' @param excludeSSP excludes subspecies information for species matching
-#' @param agg aggregation of results. Either 'none', 'species', 'plotspecies' or 'plot'
+#' @param agg aggregation of results. Either 'none', 'species', 'speciesplot', 'plotspecies' or 'plot'
 #' @param customParams custom allometry parameter table (for species not in default params)
 #' @param na.rm whether to exclude missing values when aggregating biomass
 #'
@@ -26,7 +26,7 @@
 shrubfuelbiomass <- function(x, type= "total",  allometric = TRUE, excludeSSP = TRUE,
                              agg = "none", customParams = NULL, na.rm = TRUE) {
   type = match.arg(type, c("total","fine"))
-  agg = match.arg(agg, c("none", "species", "plot", "plotspecies"))
+  agg = match.arg(agg, c("none", "species", "plot", "plotspecies", "speciesplot"))
   x = as.data.frame(x)
   vars = names(x)
   if(!("plot" %in% vars)) stop("Variable 'plot' needed in 'x'")
@@ -80,7 +80,13 @@ shrubfuelbiomass <- function(x, type= "total",  allometric = TRUE, excludeSSP = 
   } else if(agg=="plot") {
     weight = tapply(weight, x$plot, FUN = sum, na.rm=na.rm)
   } else if(agg=="plotspecies") {
-    weight = tapply(weight, list(x$plot, x$species), FUN = sum, na.rm=na.rm)
+    weight = aggregate(weight, by=list(x$species, x$plot), FUN = sum, na.rm=na.rm, drop=TRUE, simplify=TRUE)
+    weight = weight[,c(2,1,3)]
+    names(weight)<-c("plot","species", "biomass")
+  } else if(agg=="speciesplot") {
+    weight = aggregate(weight, by=list(x$plot, x$species), FUN = sum, na.rm=na.rm, drop=TRUE, simplify=TRUE)
+    weight = weight[,c(2,1,3)]
+    names(weight)<-c("species","plot", "biomass")
   } else {
     names(weight) = row.names(x)
   }

@@ -16,7 +16,7 @@ shrubfuelbiomass(x, type = "total", allometric = TRUE, excludeSSP = TRUE,
 
 \item{excludeSSP}{excludes subspecies information for species matching}
 
-\item{agg}{aggregation of results. Either 'none', 'species', 'plotspecies' or 'plot'}
+\item{agg}{aggregation of results. Either 'none', 'species', 'speciesplot', 'plotspecies' or 'plot'}
 
 \item{customParams}{custom allometry parameter table (for species not in default params)}
 
