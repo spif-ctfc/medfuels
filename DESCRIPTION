@@ -1,11 +1,11 @@
 Package: combuscat
 Type: Package
-Title: Loading for shrublands in Catalonia
+Title: Fuels of Mediterranean forests and shrublands
 Version: 0.1.0
 Authors@R: c(
 	person('Miquel', 'De Cáceres', role=c('aut','cre'),
 	        email='miquelcaceres@gmail.com'))
-Description: Functions to calculate fuel biomass and loading for shrublands in Catalonia.
+Description: Functions to calculate fuel biomass and loading for Mediterranean forests and shrublands.
 License: GPL (>= 2)
 Encoding: UTF-8
 LazyData: true
