@@ -1,6 +1,6 @@
-#' Transform individual data to species data
+#' Transform shrub individual data to species data
 #'
-#' Transforms individual data (plant heights and diameters) into species level data (average height and cover).
+#' Transforms shrub individual data (plant heights and diameters) into species level data (average height and cover).
 #'
 #' @param x data frame with columns 'plot', 'species', 'H' (height in cm), 'D1' and 'D2' (in cm)
 #' @param sampledarea sampled area in squared meters
@@ -19,7 +19,7 @@
 #' x = data.frame(plot, species, H, D1, D2)
 #'
 #' individual2species(x, sampledarea = 2)
-individual2species<-function(x, sampledarea = 20, maxcover = 100, na.rm = TRUE) {
+shrubindividual2species<-function(x, sampledarea = 20, maxcover = 100, na.rm = TRUE) {
   x = as.data.frame(x)
   vars = names(x)
   if(!("plot" %in% vars)) stop("Variable 'plot' needed in 'x'")
