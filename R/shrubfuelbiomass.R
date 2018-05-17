@@ -1,6 +1,6 @@
-#' Plant fuel biomass
+#' Shrub fuel biomass
 #'
-#' Calculates dry weight (biomass, in kg) of total or fine fuels corresponding to plant data
+#' Calculates dry weight (biomass, in kg) of total or fine fuels corresponding to individual shrub data
 #'
 #' @param x data frame with columns 'plot', 'species', 'H' (height in cm), 'D1' and 'D2' (in cm)
 #' @param type either 'total'  (total fuel) of 'fine' (fine fuels)
@@ -21,9 +21,9 @@
 #' D2 = D1
 #' x = data.frame(plot, species, H, D1, D2)
 #'
-#' plantfuelbiomass(x)
+#' shrubfuelbiomass(x)
 
-plantfuelbiomass <- function(x, type= "total",  allometric = TRUE, excludeSSP = TRUE,
+shrubfuelbiomass <- function(x, type= "total",  allometric = TRUE, excludeSSP = TRUE,
                              agg = "none", customParams = NULL, na.rm = TRUE) {
   type = match.arg(type, c("total","fine"))
   agg = match.arg(agg, c("none", "species", "plot"))

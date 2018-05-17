@@ -1,6 +1,6 @@
-#' Species fuel loading
+#' Shrub species fuel loading
 #'
-#' Calculates loading (kg/m2) of total or fine fuels corresponding to species data
+#' Calculates loading (kg/m2) of total or fine fuels corresponding to shrub species data
 #'
 #' @param x data frame with columns 'plot', 'species', 'H' (mean height in cm), 'C' (cover in percent)
 #' @param type either 'total'  (total fuel) or 'fine' (fine fuels)
@@ -20,8 +20,8 @@
 #' C = c(10,100,30, 50,25)
 #' x = data.frame(plot, species, H, C)
 #'
-#' speciesfuelloading(x)
-speciesfuelloading <- function(x, type= "total", allometric = TRUE, excludeSSP = TRUE,
+#' shrubspeciesfuelloading(x)
+shrubspeciesfuelloading <- function(x, type= "total", allometric = TRUE, excludeSSP = TRUE,
                                agg = "none", customParams = NULL, na.rm = TRUE) {
   type = match.arg(type, c("total","fine"))
   agg = match.arg(agg, c("none", "species", "plot"))
