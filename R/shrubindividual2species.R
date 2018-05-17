@@ -18,7 +18,7 @@
 #' D2 = D1
 #' x = data.frame(plot, species, H, D1, D2)
 #'
-#' individual2species(x, sampledarea = 2)
+#' shrubindividual2species(x, sampledarea = 2)
 shrubindividual2species<-function(x, sampledarea = 20, maxcover = 100, na.rm = TRUE) {
   x = as.data.frame(x)
   vars = names(x)

@@ -46,15 +46,11 @@ shrubfuelbiomass <- function(x, type= "total",  allometric = TRUE, excludeSSP = 
   }
 
   if(type=="total") {
-    data("sp_params_total")
-    data("group_params_total")
-    sp_params = sp_params_total
-    group_params = group_params_total
+    sp_params = get("sp_params_total")
+    group_params = get("group_params_total")
   } else if(type=="fine") {
-    data("sp_params_fine")
-    data("group_params_fine")
-    sp_params = sp_params_fine
-    group_params = group_params_fine
+    sp_params = get("sp_params_fine")
+    group_params = get("group_params_fine")
   }
 
   sp_list = row.names(sp_params)
@@ -94,7 +90,7 @@ shrubfuelbiomass <- function(x, type= "total",  allometric = TRUE, excludeSSP = 
 }
 
 .getSpeciesGroup<-function(sp) {
-  data("species_groups")
+  species_groups = get("species_groups")
   if(sp %in% species_groups$Name) {
     return(species_groups[which(species_groups$Name==sp),"shrub type"])
   }

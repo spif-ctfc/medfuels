@@ -29,5 +29,5 @@ D1 = c(10,100,30, 50,25)
 D2 = D1
 x = data.frame(plot, species, H, D1, D2)
 
-individual2species(x, sampledarea = 2)
+shrubindividual2species(x, sampledarea = 2)
 }

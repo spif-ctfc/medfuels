@@ -40,10 +40,8 @@ shrubspeciesfuelloading <- function(x, type= "total", allometric = TRUE, exclude
 
   hm = x$H #hm in cm
 
-  data("sp_params_area")
-  data("group_params_area")
-  sp_params = sp_params_area
-  group_params = group_params_area
+  sp_params = get("sp_params_area")
+  group_params = get("group_params_area")
 
   sp_list = row.names(sp_params)
   nrec = nrow(x)
@@ -69,15 +67,11 @@ shrubspeciesfuelloading <- function(x, type= "total", allometric = TRUE, exclude
   }
 
   if(type=="total") {
-    data("sp_params_total")
-    data("group_params_total")
-    sp_params = sp_params_total
-    group_params = group_params_total
+    sp_params = get("sp_params_total")
+    group_params = get("group_params_total")
   } else if(type=="fine") {
-    data("sp_params_fine")
-    data("group_params_fine")
-    sp_params = sp_params_fine
-    group_params = group_params_fine
+    sp_params = get("sp_params_fine")
+    group_params = get("group_params_fine")
   }
 
   sp_list = row.names(sp_params)
