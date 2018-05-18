@@ -33,8 +33,8 @@ Calculates loading (kg/m2) of total or fine fuels corresponding to shrub species
 \examples{
 plot = c(1,1,2,2,2)
 species = c("Erica arborea","Cistus albidus", "Erica arborea", "Chamaerops humilis", "Unknown")
-H = c(60,200,100,250,100)
-C = c(10,100,30, 50,25)
+H = c(60,70,200,100,10)
+C = c(10,10,30, 20,5)
 x = data.frame(plot, species, H, C)
 
 shrubspeciesfuel(x)
