@@ -9,7 +9,8 @@ individualshrubfuel(x, type = "total", allometric = TRUE,
   na.rm = TRUE)
 }
 \arguments{
-\item{x}{data frame with columns 'plot', 'species', 'H' (height in cm), 'D1' and 'D2' (in cm)}
+\item{x}{data frame with columns 'plot', 'species', 'H' (height in cm), 'D1' and 'D2' (in cm). If 'D2' is ommitted then
+shrub crowns are assumed to be circular (i.e. D2 = D1)}
 
 \item{type}{either 'total'  (total fuel) of 'fine' (fine fuels)}
 
@@ -34,8 +35,8 @@ Calculates dry weight (biomass, in kg) of total or fine fuels corresponding to i
 \examples{
 plot = c(1,1,2,2,2)
 species = c("Erica arborea","Cistus albidus", "Erica arborea", "Chamaerops humilis", "Unknown")
-H = c(60,200,100,250,100)
-D1 = c(10,100,30, 50,25)
+H = c(60,70,200,100,10)
+D1 = c(60,40,100, 100,25)
 D2 = D1
 x = data.frame(plot, species, H, D1, D2)
 

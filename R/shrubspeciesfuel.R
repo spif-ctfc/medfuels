@@ -89,7 +89,7 @@ shrubspeciesfuel <- function(x, type= "total", allometric = TRUE, excludeSSP = T
       }
       else {
         weight[i] = sp_params[sp[i],"BD"]*vol[i]
-        vars[i] = NA
+        vars[i] = (sp_params[sp[i],"BD.sd"]^2)*vol[i]
       }
     } else {
       gr = .getSpeciesGroup(sp[i])
@@ -101,7 +101,7 @@ shrubspeciesfuel <- function(x, type= "total", allometric = TRUE, excludeSSP = T
         }
         else {
           weight[i] = group_params[gr,"BD"]*vol[i]
-          vars[i] = NA
+          vars[i] = (group_params[gr,"BD.sd"]^2)*vol[i]
         }
       } else {
         warning(paste0("Species '", sp[i],"' not found in parameter file for biomass!"))
