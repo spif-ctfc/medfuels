@@ -6,6 +6,7 @@
 #' @param type either 'total'  (total fuel) of 'fine' (fine fuels)
 #' @param allometric wether to use allometric equations or bulk density estimates
 #' @param excludeSSP excludes subspecies information for species matching
+#' @param var a flag to indicate that variance of estimates is desired
 #' @param agg aggregation of results. Either 'none', 'species', 'speciesplot', 'plotspecies' or 'plot'
 #' @param customParams custom allometry parameter table (for species not in default params)
 #' @param na.rm whether to exclude missing values when aggregating biomass
@@ -21,10 +22,10 @@
 #' D2 = D1
 #' x = data.frame(plot, species, H, D1, D2)
 #'
-#' shrubfuelbiomass(x)
+#' individualshrubfuel(x)
 
-shrubfuelbiomass <- function(x, type= "total",  allometric = TRUE, excludeSSP = TRUE,
-                             agg = "none", customParams = NULL, na.rm = TRUE) {
+individualshrubfuel <- function(x, type= "total",  allometric = TRUE, excludeSSP = TRUE, var = FALSE,
+                             agg = "none",  customParams = NULL, na.rm = TRUE) {
   type = match.arg(type, c("total","fine"))
   agg = match.arg(agg, c("none", "species", "plot", "plotspecies", "speciesplot"))
   x = as.data.frame(x)
@@ -56,21 +57,30 @@ shrubfuelbiomass <- function(x, type= "total",  allometric = TRUE, excludeSSP = 
   sp_list = row.names(sp_params)
   nind = nrow(x)
   weight = rep(NA,nind)
+  vars =  rep(NA,nind)
   for(i in 1:nind) {
     if(sp[i] %in% sp_list) {
       if(allometric) {
         if(vol[i] > sp_params[sp[i],"maxVol"]) warning(paste0("Volume '", vol[i],"' outside the calibration range for '", sp[i],"'"))
         weight[i] = sp_params[sp[i],"a"]*vol[i]^sp_params[sp[i],"b"]
+        vars[i] = (weight[i]^2)*sp_params[sp[i],"gamma_disp"]
       }
-      else weight[i] = sp_params[sp[i],"BD"]*vol[i]
+      else {
+        weight[i] = sp_params[sp[i],"BD"]*vol[i]
+        vars[i] = NA
+      }
     } else {
       gr = .getSpeciesGroup(sp[i])
       if(!is.na(gr)) {
         if(allometric) {
           if(vol[i] > group_params[gr,"maxVol"]) warning(paste0("Volume '", vol[i],"' outside the calibration range for '", gr[i],"'"))
           weight[i] = group_params[gr,"a"]*vol[i]^group_params[gr,"b"]
+          vars[i] = (weight[i]^2)*group_params[gr,"gamma_disp"]
         }
-        else weight[i] = group_params[gr,"BD"]*vol[i]
+        else {
+          weight[i] = group_params[gr,"BD"]*vol[i]
+          vars[i] = NA
+        }
       } else {
         warning(paste0("Species '", sp[i],"' not found in parameter file for biomass!"))
       }
@@ -92,7 +102,30 @@ shrubfuelbiomass <- function(x, type= "total",  allometric = TRUE, excludeSSP = 
   } else {
     names(weight) = row.names(x)
   }
-  return(weight)
+  if(!var) {
+    res = weight
+  } else {
+    if(agg=="species") {
+      vars = tapply(vars, x$species, FUN = sum, na.rm=na.rm)
+      res = data.frame(biomass= weight, var = vars)
+    } else if(agg=="plot") {
+      vars = tapply(vars, x$plot, FUN = sum, na.rm=na.rm)
+      res = data.frame(biomass= weight, var = vars)
+    } else if(agg=="plotspecies") {
+      vars = aggregate(vars, by=list(x$species, x$plot), FUN = sum, na.rm=na.rm, drop=TRUE, simplify=TRUE)
+      vars = vars[,c(3)]
+      res = weight
+      res$var = vars
+    } else if(agg=="speciesplot") {
+      vars = aggregate(vars, by=list(x$species, x$plot), FUN = sum, na.rm=na.rm, drop=TRUE, simplify=TRUE)
+      vars = vars[,c(3)]
+      res = weight
+      res$var = vars
+    } else {
+      res = data.frame(biomass= weight, var = vars)
+    }
+  }
+  return(res)
 }
 
 .getSpeciesGroup<-function(sp) {

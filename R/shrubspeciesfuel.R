@@ -6,6 +6,7 @@
 #' @param type either 'total'  (total fuel) or 'fine' (fine fuels)
 #' @param allometric wether to use allometric equations or bulk density estimates
 #' @param excludeSSP excludes subspecies information for species matching
+#' @param var a flag to indicate that variance of estimates is desired
 #' @param agg aggregation of results. Either 'none' or 'plot'
 #' @param customParams custom allometry parameter table (for species not in default params)
 #' @param na.rm whether to exclude missing values when aggregating loading
@@ -20,8 +21,8 @@
 #' C = c(10,100,30, 50,25)
 #' x = data.frame(plot, species, H, C)
 #'
-#' shrubspeciesfuelloading(x)
-shrubspeciesfuelloading <- function(x, type= "total", allometric = TRUE, excludeSSP = TRUE,
+#' shrubspeciesfuel(x)
+shrubspeciesfuel <- function(x, type= "total", allometric = TRUE, excludeSSP = TRUE, var = FALSE,
                                agg = "none", customParams = NULL, na.rm = TRUE) {
   type = match.arg(type, c("total","fine"))
   agg = match.arg(agg, c("none", "species", "plot"))
@@ -78,34 +79,56 @@ shrubspeciesfuelloading <- function(x, type= "total", allometric = TRUE, exclude
 
   sp_list = row.names(sp_params)
   weight = rep(NA,nrec)
+  vars =  rep(NA,nrec)
   for(i in 1:nrec) {
     if(sp[i] %in% sp_list) {
       if(allometric) {
         if(vol[i] > sp_params[sp[i],"maxVol"]) warning(paste0("Volume '", vol[i],"' outside the calibration range for '", sp[i],"'"))
         weight[i] = sp_params[sp[i],"a"]*vol[i]^sp_params[sp[i],"b"]
+        vars[i] = (weight[i]^2)*sp_params[sp[i],"gamma_disp"]
       }
-      else weight[i] = sp_params[sp[i],"BD"]*vol[i]
+      else {
+        weight[i] = sp_params[sp[i],"BD"]*vol[i]
+        vars[i] = NA
+      }
     } else {
       gr = .getSpeciesGroup(sp[i])
       if(!is.na(gr)) {
         if(allometric) {
           if(vol[i] > group_params[gr,"maxVol"]) warning(paste0("Volume '", vol[i],"' outside the calibration range for '", gr[i],"'"))
           weight[i] = group_params[gr,"a"]*vol[i]^group_params[gr,"b"]
+          vars[i] = (weight[i]^2)*group_params[gr,"gamma_disp"]
         }
-        else weight[i] = group_params[gr,"BD"]*vol[i]
+        else {
+          weight[i] = group_params[gr,"BD"]*vol[i]
+          vars[i] = NA
+        }
       } else {
         warning(paste0("Species '", sp[i],"' not found in parameter file for biomass!"))
       }
     }
   }
 
-  if(allometric) load = weight*N
-  else load = weight
+  if(allometric) {
+    load = weight*N
+    varload = vars*N
+  }
+  else {
+    load = weight
+    varload = vars
+  }
 
   if(agg=="plot") {
     load = tapply(load, x$plot, FUN = sum, na.rm=na.rm)
+    varload = tapply(varload, x$plot, FUN = sum, na.rm=na.rm)
   } else {
     names(load) = row.names(x)
   }
-  return(load)
+
+  if(!var) {
+    res = load
+  } else {
+    res = data.frame(loading= load, var = varload)
+  }
+  return(res)
 }
