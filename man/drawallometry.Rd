@@ -4,7 +4,7 @@
 \alias{drawallometry}
 \title{Draw allometric equation}
 \usage{
-drawallometry(species, type = "total")
+drawallometry(species, type = "total", log = "")
 }
 \arguments{
 \item{species}{the specie or functional group to be drawn}
