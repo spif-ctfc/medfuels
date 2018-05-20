@@ -9,11 +9,11 @@ drawallometry(species, type = "total", log = "")
 \arguments{
 \item{species}{the specie or functional group to be drawn}
 
-\item{type}{either 'total'  (total fuel) of 'fine' (fine fuels)}
+\item{type}{'total'  (total fuel), 'fine' (fine fuels), or 'both'}
 }
 \description{
 Draw allometric equation
 }
 \examples{
-
+drawallometry("Cistus albidus")
 }
