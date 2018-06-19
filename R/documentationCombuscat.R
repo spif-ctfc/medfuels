@@ -11,11 +11,10 @@
 #'  \item group_params_area Group-specific parameter for the relation between height (in cm) and area (in cm2)
 #'  \item group_params_fine Group-specific allometric parameters for the relation between volume (in m3) and dry weight (in kg) of fine fuels
 #'  \item group_params_total Group-specific allometric parameters for the relation between volume (in m3) and dry weight (in kg) of total fuels
-#'  \item species_groups Lookup table to match species with functional groups (for species without calibrated parameters).
 #' }
 #'
 #' @name combuscat
-#' @aliases group_params_area group_params_fine group_params_total sp_params_area sp_params_fine sp_params_total species_groups
+#' @aliases group_params_area group_params_fine group_params_total sp_params_area sp_params_fine sp_params_total
 #' @docType data
 #' @author Parameter set derived from project COMBUSCAT.
 #' @keywords data

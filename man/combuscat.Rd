@@ -9,7 +9,6 @@
 \alias{sp_params_area}
 \alias{sp_params_fine}
 \alias{sp_params_total}
-\alias{species_groups}
 \title{Allometric and bulk density parameter set from project COMBUSCAT}
 \description{
 Description of the aims of the project and funding.
@@ -24,7 +23,6 @@ The data set includes seven data items:
  \item group_params_area Group-specific parameter for the relation between height (in cm) and area (in cm2)
  \item group_params_fine Group-specific allometric parameters for the relation between volume (in m3) and dry weight (in kg) of fine fuels
  \item group_params_total Group-specific allometric parameters for the relation between volume (in m3) and dry weight (in kg) of total fuels
- \item species_groups Lookup table to match species with functional groups (for species without calibrated parameters).
 }
 }
 \references{
