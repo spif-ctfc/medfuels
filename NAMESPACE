@@ -1,2 +1,5 @@
 exportPattern("^[[:alpha:]]+")
-importFrom("stats", "aggregate")
+importFrom("stats", "aggregate", "qgamma")
+importFrom("ggplot2", "ggplot","geom_line","aes",
+           "scale_y_continuous", "scale_x_continuous",
+           "geom_ribbon", "labs", "xlab", "ylab")
