@@ -8,7 +8,8 @@ shrubspeciesfuel(x, type = "total", allometric = TRUE, excludeSSP = TRUE,
   var = FALSE, agg = "none", customParams = NULL, na.rm = TRUE)
 }
 \arguments{
-\item{x}{data frame with columns 'plot', 'species', 'H' (mean height in cm), 'C' (cover in percent)}
+\item{x}{data frame with columns 'plot', 'species', 'H' (mean height in cm), 'C' (cover in percent). Column 'group' may be used to specify a functional group to be used when
+the species has not a specific allometry (see details).}
 
 \item{type}{either 'total'  (total fuel) or 'fine' (fine fuels)}
 
@@ -25,14 +26,24 @@ shrubspeciesfuel(x, type = "total", allometric = TRUE, excludeSSP = TRUE,
 \item{na.rm}{whether to exclude missing values when aggregating loading}
 }
 \value{
-a vector with loading values (kg/m2)
+a vector with species loading values (kg/m2)
 }
 \description{
 Calculates loading (kg/m2) of total or fine fuels corresponding to shrub species data
 }
+\details{
+The function determines the allometry to be applied using the following rules, sequentially:
+\enumerate{
+  \item{If the species name is included in the list of species with parameter values, it takes the parameters from that species.}
+  \item{If the species name is a synonym for a species included the list of species with parameter values, it takes the parameters from that species (and gives a warning).}
+  \item{If the user has specified a column 'group' and the value is included in the list of valid groups, it takes the parameters from that group.}
+  \item{If the species is listed within the checklist in 'species_groups', it takes the parameters from the group specified in that file.}
+  \item{Otherwise, it gives a warning and no allometry is applied.}
+}
+}
 \examples{
 plot = c(1,1,2,2,2)
-species = c("Erica arborea","Cistus albidus", "Erica arborea", "Chamaerops humilis", "Unknown")
+species = c("Erica arborea","Genista cinerea", "Erica arborea", "Chamaerops humilis", "Sarothamnus scoparius")
 H = c(60,70,200,100,10)
 C = c(10,10,30, 20,5)
 x = data.frame(plot, species, H, C)

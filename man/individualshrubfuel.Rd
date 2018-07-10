@@ -10,7 +10,8 @@ individualshrubfuel(x, type = "total", allometric = TRUE,
 }
 \arguments{
 \item{x}{data frame with columns 'plot', 'species', 'H' (height in cm), 'D1' and 'D2' (in cm). If 'D2' is ommitted then
-shrub crowns are assumed to be circular (i.e. D2 = D1)}
+shrub crowns are assumed to be circular (i.e. D2 = D1). Column 'group' may be used to specify a functional group to be used when
+the species has not a specific allometry (see details).}
 
 \item{type}{either 'total'  (total fuel) of 'fine' (fine fuels)}
 
@@ -32,9 +33,19 @@ a vector of dry weight (biomass) in kg
 \description{
 Calculates dry weight (biomass, in kg) of total or fine fuels corresponding to individual shrub data
 }
+\details{
+The function determines the allometry to be applied using the following rules, sequentially:
+\enumerate{
+  \item{If the species name is included in the list of species with parameter values, it takes the parameters from that species.}
+  \item{If the species name is a synonym for a species included the list of species with parameter values, it takes the parameters from that species (and gives a warning).}
+  \item{If the user has specified a column 'group' and the value is included in the list of valid groups, it takes the parameters from that group.}
+  \item{If the species is listed within the checklist in 'species_groups', it takes the parameters from the group specified in that file.}
+  \item{Otherwise, it gives a warning and no allometry is applied.}
+}
+}
 \examples{
 plot = c(1,1,2,2,2)
-species = c("Erica arborea","Cistus albidus", "Erica arborea", "Chamaerops humilis", "Unknown")
+species = c("Erica arborea","Genista cinerea", "Erica arborea", "Chamaerops humilis", "Genista balansae")
 H = c(60,70,200,100,10)
 D1 = c(60,40,100, 100,25)
 D2 = D1

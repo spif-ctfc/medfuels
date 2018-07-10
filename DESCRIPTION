@@ -4,7 +4,8 @@ Title: Fuels of Mediterranean forests and shrublands
 Version: 0.1.0
 Authors@R: c(
 	person('Miquel', 'De Cáceres', role=c('aut','cre'),
-	        email='miquelcaceres@gmail.com'))
+	        email='miquelcaceres@gmail.com'),
+	person('Pere', 'Casals', role=c('aut')))
 Description: Functions to calculate fuel biomass and loading for Mediterranean forests and shrublands.
 License: GPL (>= 2)
 Imports: ggplot2
