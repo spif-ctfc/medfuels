@@ -46,7 +46,7 @@ plot = c(1,1,2,2,2)
 species = c("Erica arborea","Genista cinerea", "Erica arborea", "Chamaerops humilis", "Sarothamnus scoparius")
 H = c(60,70,200,100,10)
 C = c(10,10,30, 20,5)
-x = data.frame(plot, species, H, C)
+x = data.frame(plot, species, H, C, stringsAsFactors = FALSE)
 
 shrubspeciesfuel(x)
 }

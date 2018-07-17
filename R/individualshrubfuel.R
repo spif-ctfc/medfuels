@@ -31,7 +31,7 @@
 #' H = c(60,70,200,100,10)
 #' D1 = c(60,40,100, 100,25)
 #' D2 = D1
-#' x = data.frame(plot, species, H, D1, D2)
+#' x = data.frame(plot, species, H, D1, D2, stringsAsFactors=FALSE)
 #'
 #' individualshrubfuel(x)
 
