@@ -71,7 +71,7 @@ shrubspeciesfuel <- function(x, type= "total", allometric = TRUE, excludeSSP = T
       }
       if(!is.null(spi)) {
         if(hm[i] > sp_params[spi,"maxH"]) warning(paste0("Height '", hm[i],"' outside the calibration range for '", spi,"'"))
-        area[i] = sp_params[spi,"a"]*hm[i]^2 # area in cm2
+        area[i] = sp_params[spi,"a"]*hm[i]^sp_params[spi,"b"] # area in cm2
       } else {
         gri = NULL
         if(hasGroup) {
@@ -82,7 +82,7 @@ shrubspeciesfuel <- function(x, type= "total", allometric = TRUE, excludeSSP = T
         }
         if(!is.null(gri)) {
           if(hm[i] > group_params[gri,"maxH"]) warning(paste0("Height '", hm[i],"' outside the calibration range for '", gri,"'"))
-          area[i] = group_params[gri,"a"]*hm[i]^2
+          area[i] = group_params[gri,"a"]*hm[i]^group_params[gri,"b"]
         } else {
           warning(paste0("Input species '", sp[i],"' not found in parameter file for area!"))
         }

@@ -9,7 +9,7 @@ drawshruballometry(species, type = "total", log = "")
 \arguments{
 \item{species}{The shrub species or functional group to be drawn}
 
-\item{type}{Fuel type to draw: 'total'  (total fuel), 'fine' (fine fuels), or 'both'}
+\item{type}{Allometry to draw: 'total'  (total fuel vs. volume), 'fine' (fine fuels vs. volume), 'both' (total and fine fuels vs. volume) or 'area' (area vs. height)}
 
 \item{log}{Specifies logarithmic axis: 'x', 'y' or 'xy'}
 }
