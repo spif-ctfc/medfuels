@@ -2,18 +2,22 @@
 % Please edit documentation in R/individualshrubfuel.R
 \name{individualshrubfuel}
 \alias{individualshrubfuel}
+\alias{individualshrubarea}
 \title{Shrub fuel biomass}
 \usage{
 individualshrubfuel(x, type = "total", allometric = TRUE,
   excludeSSP = TRUE, var = FALSE, agg = "none", customParams = NULL,
   na.rm = TRUE)
+
+individualshrubarea(x, excludeSSP = TRUE, var = FALSE,
+  customParams = NULL, na.rm = TRUE)
 }
 \arguments{
 \item{x}{data frame with columns 'plot', 'species', 'H' (height in cm), 'D1' and 'D2' (in cm). If 'D2' is ommitted then
 shrub crowns are assumed to be circular (i.e. D2 = D1). Column 'group' may be used to specify a functional group to be used when
 the species has not a specific allometry (see details).}
 
-\item{type}{either 'total'  (total fuel) of 'fine' (fine fuels)}
+\item{type}{'total'  (total fuel) or 'fine' (fine fuels)}
 
 \item{allometric}{wether to use allometric equations or bulk density estimates}
 

@@ -4,7 +4,8 @@
 \alias{individualshrub2species}
 \title{Transform shrub individual data to species data}
 \usage{
-individualshrub2species(x, sampledarea = 20, maxcover = 100, na.rm = TRUE)
+individualshrub2species(x, sampledarea = 20, maxcover = 100, na.rm = TRUE,
+  sd.H = FALSE)
 }
 \arguments{
 \item{x}{data frame with columns 'plot', 'species', 'H' (height in cm), 'D1' and 'D2' (in cm)}
@@ -14,6 +15,8 @@ individualshrub2species(x, sampledarea = 20, maxcover = 100, na.rm = TRUE)
 \item{maxcover}{maximum allowed cover (set to NA to avoid truncation)}
 
 \item{na.rm}{whether to exclude missing values when averaging heights and adding areas}
+
+\item{sd.H}{whether to include the standard deviation of heights in the output}
 }
 \value{
 data frame with columns 'plot', 'species', 'H' (mean height in cm), 'C' (cover in percent)

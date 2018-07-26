@@ -2,10 +2,12 @@
 #'
 #' Calculates dry weight (biomass, in kg) of total or fine fuels corresponding to individual shrub data
 #'
+#' @name individualshrubfuel
+#'
 #' @param x data frame with columns 'plot', 'species', 'H' (height in cm), 'D1' and 'D2' (in cm). If 'D2' is ommitted then
 #'          shrub crowns are assumed to be circular (i.e. D2 = D1). Column 'group' may be used to specify a functional group to be used when
 #'          the species has not a specific allometry (see details).
-#' @param type either 'total'  (total fuel) of 'fine' (fine fuels)
+#' @param type 'total'  (total fuel) or 'fine' (fine fuels)
 #' @param allometric wether to use allometric equations or bulk density estimates
 #' @param excludeSSP excludes subspecies information for species matching
 #' @param var a flag to indicate that variance of estimates is desired
@@ -41,7 +43,7 @@ individualshrubfuel <- function(x, type= "total",  allometric = TRUE, excludeSSP
   agg = match.arg(agg, c("none", "species", "plot", "plotspecies", "speciesplot"))
   x = as.data.frame(x)
   vars = names(x)
-  if(!("plot" %in% vars)) stop("Variable 'plot' needed in 'x'")
+  if(agg %in% c("plot", "plotspecies", "speciesplot")) {if(!("plot" %in% vars)) stop("Variable 'plot' needed in 'x'")}
   if(!("species" %in% vars)) stop("Variable 'species' needed in 'x'")
   if(!("H" %in% vars)) stop("Variable 'H' needed in 'x'")
   if(!("D1" %in% vars)) stop("Variable 'D1' needed in 'x'")
@@ -160,3 +162,67 @@ individualshrubfuel <- function(x, type= "total",  allometric = TRUE, excludeSSP
   return(res)
 }
 
+#' @rdname individualshrubfuel
+#'
+individualshrubarea <- function(x, excludeSSP = TRUE, var = FALSE,
+                                customParams = NULL, na.rm = TRUE) {
+  x = as.data.frame(x)
+  vars = names(x)
+  if(!("species" %in% vars)) stop("Variable 'species' needed in 'x'")
+  if(!("H" %in% vars)) stop("Variable 'H' needed in 'x'")
+
+  h = x$H
+
+  hasGroup = ("group" %in% vars)
+  if(hasGroup) gr = as.character(x$group)
+  sp = as.character(x$species)
+  if(excludeSSP) {
+    s = strsplit(as.character(sp), " ")
+    sp = unlist(lapply(s, function(x) {paste(x[1:min(2,length(x))], collapse=" ")}))
+  }
+
+  sp_params = get("sp_params_area")
+  group_params = get("group_params_area")
+
+  sp_list = row.names(sp_params)
+  gr_list = row.names(group_params)
+  nind = nrow(x)
+  area = rep(NA,nind)
+  vars =  rep(NA,nind)
+  for(i in 1:nind) {
+    spi = NULL
+    if(sp[i] %in% sp_list) {
+      spi = sp[i]
+    } else { #try translating the synonym
+      spi = .translateSynonym(sp[i])
+      if(!is.null(spi)) warning(paste0("Input species '", sp[i],"' translated to '",spi,"'."))
+    }
+    if(!is.null(spi)) {
+      if(h[i] > sp_params[spi,"maxH"]) warning(paste0("Height '", h[i],"' outside the calibration range for '", spi,"'"))
+      area[i] = sp_params[spi,"a"]*h[i]^sp_params[spi,"b"]
+      vars[i] = (area[i]^2)*sp_params[spi,"gamma_disp"]
+    } else {
+      gri = NULL
+      if(hasGroup) {
+        if(gr[i] %in% gr_list) gri = gr[i]
+      }
+      if(is.null(gri)) {
+        gri = .getSpeciesGroup(sp[i])
+      }
+      if(!is.null(gri)) {
+        if(h[i] > group_params[gri,"maxH"]) warning(paste0("Volume '", h[i],"' outside the calibration range for '", gri,"'"))
+        area[i] = group_params[gri,"a"]*h[i]^group_params[gri,"b"]
+        vars[i] = (area[i]^2)*group_params[gri,"gamma_disp"]
+      } else {
+        warning(paste0("Input species '", sp[i],"' not found in parameter file for biomass!"))
+      }
+    }
+  }
+
+  if(!var) {
+    res = area
+  } else {
+    res = data.frame(area= area, var = vars)
+  }
+  return(res)
+}

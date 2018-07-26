@@ -6,6 +6,7 @@
 #' @param sampledarea sampled area in squared meters
 #' @param maxcover maximum allowed cover (set to NA to avoid truncation)
 #' @param na.rm whether to exclude missing values when averaging heights and adding areas
+#' @param sd.H whether to include the standard deviation of heights in the output
 #'
 #' @return data frame with columns 'plot', 'species', 'H' (mean height in cm), 'C' (cover in percent)
 #' @export
@@ -19,7 +20,7 @@
 #' x = data.frame(plot, species, H, D1, D2)
 #'
 #' individualshrub2species(x, sampledarea = 2)
-individualshrub2species<-function(x, sampledarea = 20, maxcover = 100, na.rm = TRUE) {
+individualshrub2species<-function(x, sampledarea = 20, maxcover = 100, na.rm = TRUE, sd.H = FALSE) {
   x = as.data.frame(x)
   vars = names(x)
   if(!("plot" %in% vars)) stop("Variable 'plot' needed in 'x'")
@@ -39,6 +40,9 @@ individualshrub2species<-function(x, sampledarea = 20, maxcover = 100, na.rm = T
                       species = levels(species),
                       H = tapply(pc$H, species, FUN=mean, na.rm=na.rm),
                       C = 100*tapply(area, species, FUN=sum, na.rm=na.rm)/sampledarea)
+    if(sd.H) {
+      shpc$sdH = tapply(pc$H, species, FUN=sd, na.rm=na.rm)
+    }
     row.names(shpc) = NULL
     if(!is.null(shspdata)) shspdata = rbind(shspdata, shpc)
     else shspdata = shpc
