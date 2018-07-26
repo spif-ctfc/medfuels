@@ -7,10 +7,10 @@
 \usage{
 individualshrubfuel(x, type = "total", allometric = TRUE,
   excludeSSP = TRUE, var = FALSE, agg = "none", customParams = NULL,
-  na.rm = TRUE)
+  outside = "warning", na.rm = TRUE)
 
 individualshrubarea(x, excludeSSP = TRUE, var = FALSE,
-  customParams = NULL, na.rm = TRUE)
+  customParams = NULL, outside = "warning", na.rm = TRUE)
 }
 \arguments{
 \item{x}{data frame with columns 'plot', 'species', 'H' (height in cm), 'D1' and 'D2' (in cm). If 'D2' is ommitted then
@@ -28,6 +28,8 @@ the species has not a specific allometry (see details).}
 \item{agg}{aggregation of results. Either 'none', 'species', 'speciesplot', 'plotspecies' or 'plot'}
 
 \item{customParams}{custom allometry parameter table (for species not in default params)}
+
+\item{outside}{Treament of values outside calibration range: either 'warning' (to prompt a warning) or 'missing' (prompt a warning and return NA)}
 
 \item{na.rm}{whether to exclude missing values when aggregating biomass}
 }

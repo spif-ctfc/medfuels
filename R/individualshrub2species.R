@@ -12,14 +12,14 @@
 #' @export
 #'
 #' @examples
-#' plot = c(1,1,2,2,2)
-#' species = c("Erica arborea","Cistus albidus", "Erica arborea", "Chamaerops humilis", "Unknown")
-#' H = c(60,200,100,250,100)
-#' D1 = c(10,100,30, 50,25)
+#' plot = c(1,1,1,1,1)
+#' species = c("Erica arborea","Cistus albidus", "Erica arborea", "Cistus albidus", "Cistus albidus")
+#' H = c(200,50,100,40,30)
+#' D1 = c(140,40,100, 35,30)
 #' D2 = D1
 #' x = data.frame(plot, species, H, D1, D2)
 #'
-#' individualshrub2species(x, sampledarea = 2)
+#' individualshrub2species(x, sampledarea = 4)
 individualshrub2species<-function(x, sampledarea = 20, maxcover = 100, na.rm = TRUE, sd.H = FALSE) {
   x = as.data.frame(x)
   vars = names(x)
@@ -36,10 +36,10 @@ individualshrub2species<-function(x, sampledarea = 20, maxcover = 100, na.rm = T
     pc = x[as.character(x$plot)==plots[i],]
     area = pi*((pc$D1/200)*(pc$D2/200)) #area in m2
     species = as.factor(as.character(pc$species))
-    shpc = data.frame(plot = rep(plots[i], length(levels(species))),
+    shpc = data.frame(plot = rep(as.character(plots[i]), length(levels(species))),
                       species = levels(species),
-                      H = tapply(pc$H, species, FUN=mean, na.rm=na.rm),
-                      C = 100*tapply(area, species, FUN=sum, na.rm=na.rm)/sampledarea)
+                      H = tapply(pc$H*area, species, FUN=sum, na.rm=na.rm)/tapply(area, species, FUN=sum, na.rm=na.rm), #area-weighted average of heights
+                      C = 100*tapply(area, species, FUN=sum, na.rm=na.rm)/sampledarea, stringsAsFactors = FALSE)
     if(sd.H) {
       shpc$sdH = tapply(pc$H, species, FUN=sd, na.rm=na.rm)
     }

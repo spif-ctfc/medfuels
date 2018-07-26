@@ -11,6 +11,7 @@
 #' @param agg aggregation of results. Either 'none' or 'plot'
 #' @param customParams custom allometry parameter table (for species not in default params)
 #' @param na.rm whether to exclude missing values when aggregating loading
+#' @param outside Treament of values outside calibration range: either 'warning' (to prompt a warning) or 'missing' (prompt a warning and return NA)
 #'
 #' @return a vector with species loading values (kg/m2)
 #' @export
@@ -33,9 +34,10 @@
 #'
 #' shrubspeciesfuel(x)
 shrubspeciesfuel <- function(x, type= "total", allometric = TRUE, excludeSSP = TRUE, var = FALSE,
-                               agg = "none", customParams = NULL, na.rm = TRUE) {
+                               agg = "none", customParams = NULL, outside = "warning", na.rm = TRUE) {
   type = match.arg(type, c("total","fine"))
   agg = match.arg(agg, c("none", "species", "plot"))
+  outside = match.arg(outside, c("warning", "missing"))
   x = as.data.frame(x)
   vars = names(x)
   if(!("plot" %in% vars)) stop("Variable 'plot' needed in 'x'")
@@ -70,8 +72,15 @@ shrubspeciesfuel <- function(x, type= "total", allometric = TRUE, excludeSSP = T
         if(!is.null(spi)) warning(paste0("Input species '", sp[i],"' translated to '",spi,"'."))
       }
       if(!is.null(spi)) {
-        if(hm[i] > sp_params[spi,"maxH"]) warning(paste0("Height '", hm[i],"' outside the calibration range for '", spi,"'"))
         area[i] = sp_params[spi,"a"]*hm[i]^sp_params[spi,"b"] # area in cm2
+        if(hm[i] > sp_params[spi,"maxH"]) {
+          if(outside=="warning") {
+            warning(paste0("Height '", hm[i],"' outside the calibration range for '", spi,"'."))
+          } else {
+            warning(paste0("Height '", hm[i],"' outside the calibration range for '", spi,"' set to NA."))
+            area[i] = NA
+          }
+        }
       } else {
         gri = NULL
         if(hasGroup) {
@@ -81,8 +90,15 @@ shrubspeciesfuel <- function(x, type= "total", allometric = TRUE, excludeSSP = T
           gri = .getSpeciesGroup(sp[i])
         }
         if(!is.null(gri)) {
-          if(hm[i] > group_params[gri,"maxH"]) warning(paste0("Height '", hm[i],"' outside the calibration range for '", gri,"'"))
           area[i] = group_params[gri,"a"]*hm[i]^group_params[gri,"b"]
+          if(hm[i] > group_params[gri,"maxH"]) {
+            if(outside=="warning") {
+              warning(paste0("Height '", hm[i],"' outside the calibration range for '", gri,"'."))
+            } else {
+              warning(paste0("Height '", hm[i],"' outside the calibration range for '", gri,"' set to NA."))
+              area[i] = NA
+            }
+          }
         } else {
           warning(paste0("Input species '", sp[i],"' not found in parameter file for area!"))
         }
@@ -108,42 +124,60 @@ shrubspeciesfuel <- function(x, type= "total", allometric = TRUE, excludeSSP = T
   weight = rep(NA,nrec)
   vars =  rep(NA,nrec)
   for(i in 1:nrec) {
-    spi = NULL
-    if(sp[i] %in% sp_list) {
-      spi = sp[i]
-    } else { #try translating the synonym
-      spi = .translateSynonym(sp[i])
-      if(!is.null(spi)) warning(paste0("Input species '", sp[i],"' translated to '",spi,"'."))
-    }
-    if(!is.null(spi)) {
-      if(allometric) {
-        if(vol[i] > sp_params[spi,"maxVol"]) warning(paste0("Volume '", vol[i],"' outside the calibration range for '", spi,"'"))
-        weight[i] = sp_params[spi,"a"]*vol[i]^sp_params[spi,"b"]
-        vars[i] = (weight[i]^2)*sp_params[spi,"gamma_disp"]
-      } else {
-        weight[i] = sp_params[spi,"BD"]*vol[i]
-        vars[i] = (sp_params[spi,"BD.sd"]^2)*vol[i]
+    if(!is.na(vol[i])) {
+      spi = NULL
+      if(sp[i] %in% sp_list) {
+        spi = sp[i]
+      } else { #try translating the synonym
+        spi = .translateSynonym(sp[i])
+        if(!is.null(spi)) warning(paste0("Input species '", sp[i],"' translated to '",spi,"'."))
       }
-    } else {
-      gri = NULL
-      if(hasGroup) {
-        if(gr[i] %in% gr_list) gri = gr[i]
-      }
-      if(is.null(gri)) {
-        gri = .getSpeciesGroup(sp[i])
-      }
-      if(!is.null(gri)) {
+      if(!is.null(spi)) {
         if(allometric) {
-          if(vol[i] > group_params[gri,"maxVol"]) warning(paste0("Volume '", vol[i],"' outside the calibration range for '", gri,"'"))
-          weight[i] = group_params[gri,"a"]*vol[i]^group_params[gri,"b"]
-          vars[i] = (weight[i]^2)*group_params[gri,"gamma_disp"]
-        }
-        else {
-          weight[i] = group_params[gri,"BD"]*vol[i]
-          vars[i] = (group_params[gri,"BD.sd"]^2)*vol[i]
+          weight[i] = sp_params[spi,"a"]*vol[i]^sp_params[spi,"b"]
+          vars[i] = (weight[i]^2)*sp_params[spi,"gamma_disp"]
+          if(vol[i] > sp_params[spi,"maxVol"]) {
+            if(outside=="warning") {
+              warning(paste0("Volume '", vol[i],"' outside the calibration range for '", spi,"'."))
+            } else {
+              warning(paste0("Volume '", vol[i],"' outside the calibration range for '", spi,"' set to NA."))
+              weight[i] = NA
+              vars[i] = NA
+            }
+          }
+        } else {
+          weight[i] = sp_params[spi,"BD"]*vol[i]
+          vars[i] = (sp_params[spi,"BD.sd"]^2)*vol[i]
         }
       } else {
-        warning(paste0("Input species '", sp[i],"' not found in parameter file for biomass!"))
+        gri = NULL
+        if(hasGroup) {
+          if(gr[i] %in% gr_list) gri = gr[i]
+        }
+        if(is.null(gri)) {
+          gri = .getSpeciesGroup(sp[i])
+        }
+        if(!is.null(gri)) {
+          if(allometric) {
+            weight[i] = group_params[gri,"a"]*vol[i]^group_params[gri,"b"]
+            vars[i] = (weight[i]^2)*group_params[gri,"gamma_disp"]
+            if(vol[i] > group_params[gri,"maxVol"]) {
+              if(outside=="warning") {
+                warning(paste0("Volume '", vol[i],"' outside the calibration range for '", gri,"'."))
+              } else {
+                warning(paste0("Volume '", vol[i],"' outside the calibration range for '", gri,"' set to NA."))
+                weight[i] = NA
+                vars[i] = NA
+              }
+            }
+          }
+          else {
+            weight[i] = group_params[gri,"BD"]*vol[i]
+            vars[i] = (group_params[gri,"BD.sd"]^2)*vol[i]
+          }
+        } else {
+          warning(paste0("Input species '", sp[i],"' not found in parameter file for biomass!"))
+        }
       }
     }
   }

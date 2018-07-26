@@ -5,7 +5,8 @@
 \title{Shrub species fuel loading}
 \usage{
 shrubspeciesfuel(x, type = "total", allometric = TRUE, excludeSSP = TRUE,
-  var = FALSE, agg = "none", customParams = NULL, na.rm = TRUE)
+  var = FALSE, agg = "none", customParams = NULL, outside = "warning",
+  na.rm = TRUE)
 }
 \arguments{
 \item{x}{data frame with columns 'plot', 'species', 'H' (mean height in cm), 'C' (cover in percent). Column 'group' may be used to specify a functional group to be used when
@@ -22,6 +23,8 @@ the species has not a specific allometry (see details).}
 \item{agg}{aggregation of results. Either 'none' or 'plot'}
 
 \item{customParams}{custom allometry parameter table (for species not in default params)}
+
+\item{outside}{Treament of values outside calibration range: either 'warning' (to prompt a warning) or 'missing' (prompt a warning and return NA)}
 
 \item{na.rm}{whether to exclude missing values when aggregating loading}
 }

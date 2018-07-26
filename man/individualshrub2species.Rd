@@ -25,12 +25,12 @@ data frame with columns 'plot', 'species', 'H' (mean height in cm), 'C' (cover i
 Transforms shrub individual data (plant heights and diameters) into species level data (average height and cover).
 }
 \examples{
-plot = c(1,1,2,2,2)
-species = c("Erica arborea","Cistus albidus", "Erica arborea", "Chamaerops humilis", "Unknown")
-H = c(60,200,100,250,100)
-D1 = c(10,100,30, 50,25)
+plot = c(1,1,1,1,1)
+species = c("Erica arborea","Cistus albidus", "Erica arborea", "Cistus albidus", "Cistus albidus")
+H = c(200,50,100,40,30)
+D1 = c(140,40,100, 35,30)
 D2 = D1
 x = data.frame(plot, species, H, D1, D2)
 
-individualshrub2species(x, sampledarea = 2)
+individualshrub2species(x, sampledarea = 4)
 }

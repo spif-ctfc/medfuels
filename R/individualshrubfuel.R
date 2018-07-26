@@ -13,6 +13,7 @@
 #' @param var a flag to indicate that variance of estimates is desired
 #' @param agg aggregation of results. Either 'none', 'species', 'speciesplot', 'plotspecies' or 'plot'
 #' @param customParams custom allometry parameter table (for species not in default params)
+#' @param outside Treament of values outside calibration range: either 'warning' (to prompt a warning) or 'missing' (prompt a warning and return NA)
 #' @param na.rm whether to exclude missing values when aggregating biomass
 #'
 #' @details The function determines the allometry to be applied using the following rules, sequentially:
@@ -38,7 +39,7 @@
 #' individualshrubfuel(x)
 
 individualshrubfuel <- function(x, type= "total",  allometric = TRUE, excludeSSP = TRUE, var = FALSE,
-                             agg = "none",  customParams = NULL, na.rm = TRUE) {
+                             agg = "none",  customParams = NULL, outside = "warning", na.rm = TRUE) {
   type = match.arg(type, c("total","fine"))
   agg = match.arg(agg, c("none", "species", "plot", "plotspecies", "speciesplot"))
   x = as.data.frame(x)
@@ -89,9 +90,17 @@ individualshrubfuel <- function(x, type= "total",  allometric = TRUE, excludeSSP
     }
     if(!is.null(spi)) {
       if(allometric) {
-        if(vol[i] > sp_params[spi,"maxVol"]) warning(paste0("Volume '", vol[i],"' outside the calibration range for '", spi,"'"))
         weight[i] = sp_params[spi,"a"]*vol[i]^sp_params[spi,"b"]
         vars[i] = (weight[i]^2)*sp_params[spi,"gamma_disp"]
+        if(vol[i] > sp_params[spi,"maxVol"]) {
+          if(outside=="warning") {
+            warning(paste0("Volume '", vol[i],"' outside the calibration range for '", spi,"'."))
+          } else {
+            warning(paste0("Volume '", vol[i],"' outside the calibration range for '", spi,"' set to NA."))
+            weight[i] = NA
+            vars[i] = NA
+          }
+        }
       }
       else {
         weight[i] = sp_params[spi,"BD"]*vol[i]
@@ -107,9 +116,17 @@ individualshrubfuel <- function(x, type= "total",  allometric = TRUE, excludeSSP
       }
       if(!is.null(gri)) {
         if(allometric) {
-          if(vol[i] > group_params[gri,"maxVol"]) warning(paste0("Volume '", vol[i],"' outside the calibration range for '", gri,"'"))
           weight[i] = group_params[gri,"a"]*vol[i]^group_params[gri,"b"]
           vars[i] = (weight[i]^2)*group_params[gri,"gamma_disp"]
+          if(vol[i] > group_params[gri,"maxVol"]) {
+            if(outside=="warning") {
+              warning(paste0("Volume '", vol[i],"' outside the calibration range for '", gri,"'."))
+            } else {
+              warning(paste0("Volume '", vol[i],"' outside the calibration range for '", gri,"' set to NA."))
+              weight[i] = NA
+              vars[i] = NA
+            }
+          }
         }
         else {
           weight[i] = group_params[gri,"BD"]*vol[i]
@@ -165,7 +182,7 @@ individualshrubfuel <- function(x, type= "total",  allometric = TRUE, excludeSSP
 #' @rdname individualshrubfuel
 #'
 individualshrubarea <- function(x, excludeSSP = TRUE, var = FALSE,
-                                customParams = NULL, na.rm = TRUE) {
+                                customParams = NULL, outside = "warning", na.rm = TRUE) {
   x = as.data.frame(x)
   vars = names(x)
   if(!("species" %in% vars)) stop("Variable 'species' needed in 'x'")
@@ -198,9 +215,17 @@ individualshrubarea <- function(x, excludeSSP = TRUE, var = FALSE,
       if(!is.null(spi)) warning(paste0("Input species '", sp[i],"' translated to '",spi,"'."))
     }
     if(!is.null(spi)) {
-      if(h[i] > sp_params[spi,"maxH"]) warning(paste0("Height '", h[i],"' outside the calibration range for '", spi,"'"))
       area[i] = sp_params[spi,"a"]*h[i]^sp_params[spi,"b"]
       vars[i] = (area[i]^2)*sp_params[spi,"gamma_disp"]
+      if(h[i] > sp_params[spi,"maxH"]) {
+        if(outside=="warning") {
+          warning(paste0("Height '", h[i],"' outside the calibration range for '", spi,"'."))
+        } else {
+          warning(paste0("Height '", h[i],"' outside the calibration range for '", spi,"' set to NA."))
+          area[i] = NA
+          vars[i] = NA
+        }
+      }
     } else {
       gri = NULL
       if(hasGroup) {
@@ -210,9 +235,17 @@ individualshrubarea <- function(x, excludeSSP = TRUE, var = FALSE,
         gri = .getSpeciesGroup(sp[i])
       }
       if(!is.null(gri)) {
-        if(h[i] > group_params[gri,"maxH"]) warning(paste0("Volume '", h[i],"' outside the calibration range for '", gri,"'"))
         area[i] = group_params[gri,"a"]*h[i]^group_params[gri,"b"]
         vars[i] = (area[i]^2)*group_params[gri,"gamma_disp"]
+        if(h[i] > group_params[gri,"maxH"]) {
+          if(outside=="warning") {
+            warning(paste0("Volume '", h[i],"' outside the calibration range for '", gri,"'."))
+          } else {
+            warning(paste0("Volume '", h[i],"' outside the calibration range for '", gri,"' set to NA."))
+            area[i] = NA
+            vars[i] = NA
+          }
+        }
       } else {
         warning(paste0("Input species '", sp[i],"' not found in parameter file for biomass!"))
       }
