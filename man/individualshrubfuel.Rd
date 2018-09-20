@@ -6,8 +6,8 @@
 \title{Shrub fuel biomass}
 \usage{
 individualshrubfuel(x, type = "total", allometric = TRUE,
-  excludeSSP = TRUE, var = FALSE, agg = "none", customParams = NULL,
-  outside = "warning", na.rm = TRUE)
+  excludeSSP = TRUE, var = FALSE, agg = "none",
+  customParams = NULL, outside = "warning", na.rm = TRUE)
 
 individualshrubarea(x, excludeSSP = TRUE, var = FALSE,
   customParams = NULL, outside = "warning", na.rm = TRUE)

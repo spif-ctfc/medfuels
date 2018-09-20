@@ -113,6 +113,7 @@ individualshrubfuel <- function(x, type= "total",  allometric = TRUE, excludeSSP
       }
       if(is.null(gri)) {
         gri = .getSpeciesGroup(sp[i])
+        # print(c(sp[i], gri))
       }
       if(!is.null(gri)) {
         if(allometric) {

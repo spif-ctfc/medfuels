@@ -4,9 +4,9 @@
 \alias{shrubspeciesfuel}
 \title{Shrub species fuel loading}
 \usage{
-shrubspeciesfuel(x, type = "total", allometric = TRUE, excludeSSP = TRUE,
-  var = FALSE, agg = "none", customParams = NULL, outside = "warning",
-  na.rm = TRUE)
+shrubspeciesfuel(x, type = "total", allometric = TRUE,
+  excludeSSP = TRUE, var = FALSE, agg = "none",
+  customParams = NULL, outside = "warning", na.rm = TRUE)
 }
 \arguments{
 \item{x}{data frame with columns 'plot', 'species', 'H' (mean height in cm), 'C' (cover in percent). Column 'group' may be used to specify a functional group to be used when

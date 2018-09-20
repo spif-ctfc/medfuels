@@ -4,8 +4,8 @@
 \alias{individualshrub2species}
 \title{Transform shrub individual data to species data}
 \usage{
-individualshrub2species(x, sampledarea = 20, maxcover = 100, na.rm = TRUE,
-  sd.H = FALSE)
+individualshrub2species(x, sampledarea = 20, maxcover = 100,
+  na.rm = TRUE, sd.H = FALSE)
 }
 \arguments{
 \item{x}{data frame with columns 'plot', 'species', 'H' (height in cm), 'D1' and 'D2' (in cm)}
