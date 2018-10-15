@@ -260,3 +260,43 @@ individualshrubarea <- function(x, excludeSSP = TRUE, var = FALSE,
   }
   return(res)
 }
+
+
+#' @rdname individualshrubfuel
+#'
+individualshrubvolume <- function(x, agg = "none", na.rm = TRUE) {
+  agg = match.arg(agg, c("none", "species", "plot", "plotspecies", "speciesplot"))
+  x = as.data.frame(x)
+  vars = names(x)
+  if(agg %in% c("plot", "plotspecies", "speciesplot")) {if(!("plot" %in% vars)) stop("Variable 'plot' needed in 'x'")}
+  if(!("species" %in% vars)) stop("Variable 'species' needed in 'x'")
+  if(!("H" %in% vars)) stop("Variable 'H' needed in 'x'")
+  if(!("D1" %in% vars)) stop("Variable 'D1' needed in 'x'")
+
+  h = x$H/100 #from cm to m
+  d1 = x$D1/100
+  if(!("D2" %in% vars)) {
+    warning("Assuming D2 = D1 (circular crown projection)")
+    d2 = d1
+  } else {
+    d2 = x$D2/100
+  }
+  vol = h*pi*(d1/2)*(d2/2)
+
+  if(agg=="species") {
+    vol = tapply(vol, x$species, FUN = sum, na.rm=na.rm)
+  } else if(agg=="plot") {
+    vol = tapply(vol, x$plot, FUN = sum, na.rm=na.rm)
+  } else if(agg=="plotspecies") {
+    vol = aggregate(vol, by=list(x$species, x$plot), FUN = sum, na.rm=na.rm, drop=TRUE, simplify=TRUE)
+    vol = vol[,c(2,1,3)]
+    names(weight)<-c("plot","species", "volume")
+  } else if(agg=="speciesplot") {
+    vol = aggregate(vol, by=list(x$plot, x$species), FUN = sum, na.rm=na.rm, drop=TRUE, simplify=TRUE)
+    vol = vol[,c(2,1,3)]
+    names(vol)<-c("species","plot", "volume")
+  } else {
+    names(vol) = row.names(x)
+  }
+  return(vol)
+}

@@ -3,6 +3,7 @@
 \name{individualshrubfuel}
 \alias{individualshrubfuel}
 \alias{individualshrubarea}
+\alias{individualshrubvolume}
 \title{Shrub fuel biomass}
 \usage{
 individualshrubfuel(x, type = "total", allometric = TRUE,
@@ -11,6 +12,8 @@ individualshrubfuel(x, type = "total", allometric = TRUE,
 
 individualshrubarea(x, excludeSSP = TRUE, var = FALSE,
   customParams = NULL, outside = "warning", na.rm = TRUE)
+
+individualshrubvolume(x, agg = "none", na.rm = TRUE)
 }
 \arguments{
 \item{x}{data frame with columns 'plot', 'species', 'H' (height in cm), 'D1' and 'D2' (in cm). If 'D2' is ommitted then
