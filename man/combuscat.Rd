@@ -3,6 +3,7 @@
 \docType{data}
 \name{combuscat}
 \alias{combuscat}
+\alias{individual_data,}
 \alias{group_params_area}
 \alias{group_params_fine}
 \alias{group_params_total}
@@ -17,6 +18,7 @@ Description of the aims of the project and funding.
 The data set includes seven data items:
 
 \itemize{
+ \item individual_data Individual-based data underlying the development of allometric equations
  \item sp_params_area Species-specific parameter for the relation between height (in cm) and area (in cm2)
  \item sp_params_fine Species-specific allometric parameters for the relation between volume (in m3) and dry weight (in kg) of fine fuels
  \item sp_params_total Species-specific allometric parameters for the relation between volume (in m3) and dry weight (in kg) of total fuels
