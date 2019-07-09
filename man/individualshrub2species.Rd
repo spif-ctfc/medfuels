@@ -2,9 +2,13 @@
 % Please edit documentation in R/individualshrub2species.R
 \name{individualshrub2species}
 \alias{individualshrub2species}
+\alias{individualshrub2stand}
 \title{Transform shrub individual data to species data}
 \usage{
 individualshrub2species(x, sampledarea = 20, maxcover = 100,
+  na.rm = TRUE, sd.H = FALSE)
+
+individualshrub2stand(x, sampledarea = 20, maxcover = 100,
   na.rm = TRUE, sd.H = FALSE)
 }
 \arguments{

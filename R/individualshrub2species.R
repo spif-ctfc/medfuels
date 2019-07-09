@@ -2,6 +2,7 @@
 #'
 #' Transforms shrub individual data (plant heights and diameters) into species level data (average height and cover).
 #'
+#' @name individualshrub2species
 #' @param x data frame with columns 'plot', 'species', 'H' (height in cm), 'D1' and 'D2' (in cm)
 #' @param sampledarea sampled area in squared meters
 #' @param maxcover maximum allowed cover (set to NA to avoid truncation)
@@ -49,4 +50,22 @@ individualshrub2species<-function(x, sampledarea = 20, maxcover = 100, na.rm = T
   }
   if(!is.na(maxcover)) shspdata$C = pmin(maxcover, shspdata$C)
   return(shspdata)
+}
+
+#' @rdname individualshrub2species
+individualshrub2stand<-function(x, sampledarea = 20, maxcover = 100, na.rm = TRUE, sd.H = FALSE) {
+  x = as.data.frame(x)
+  vars = names(x)
+  if(!("plot" %in% vars)) stop("Variable 'plot' needed in 'x'")
+  if(!("H" %in% vars)) stop("Variable 'H' needed in 'x'")
+  if(!("D1" %in% vars)) stop("Variable 'D1' needed in 'x'")
+  if(!("D2" %in% vars)) stop("Variable 'D2' needed in 'x'")
+
+  area = pi*((x$D1/200)*(x$D2/200)) #area in m2
+  H = tapply(x$H*area, x$plot, FUN=sum, na.rm=na.rm)/tapply(area, x$plot, FUN=sum, na.rm=na.rm) #area-weighted average of heights
+  C = 100*tapply(area, x$plot, FUN=sum, na.rm=na.rm)/sampledarea
+
+  shdata = data.frame(H = H, C = C, row.names = names(H), stringsAsFactors = F)
+  if(!is.na(maxcover)) shdata$C = pmin(maxcover, shdata$C)
+  return(shdata)
 }
