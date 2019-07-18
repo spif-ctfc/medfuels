@@ -7,6 +7,7 @@
 #' @param type either 'total'  (total fuel) or 'fine' (fine fuels)
 #' @param allometric wether to use allometric equations or bulk density estimates
 #' @param excludeSSP excludes subspecies information for species matching
+#' @param equationNames a flag to indicate that the name of species or group biomass allometry or bulk density used is desired
 #' @param var a flag to indicate that variance of estimates is desired
 #' @param agg aggregation of results. Either 'none' or 'plot'
 #' @param customParams custom allometry parameter table (for species not in default params)
@@ -33,8 +34,9 @@
 #' x = data.frame(plot, species, H, C, stringsAsFactors = FALSE)
 #'
 #' shrubspeciesfuel(x)
-shrubspeciesfuel <- function(x, type= "total", allometric = TRUE, excludeSSP = TRUE, var = FALSE,
-                               agg = "none", customParams = NULL, outside = "warning", na.rm = TRUE) {
+shrubspeciesfuel <- function(x, type= "total", allometric = TRUE, excludeSSP = TRUE, equationNames = FALSE,
+                             var = FALSE,
+                             agg = "none", customParams = NULL, outside = "warning", na.rm = TRUE) {
   type = match.arg(type, c("total","fine"))
   agg = match.arg(agg, c("none", "species", "plot"))
   outside = match.arg(outside, c("warning", "missing"))
@@ -123,6 +125,8 @@ shrubspeciesfuel <- function(x, type= "total", allometric = TRUE, excludeSSP = T
   gr_list = row.names(group_params)
   weight = rep(NA,nrec)
   vars =  rep(NA,nrec)
+  eqnNames = rep(NA,nrec)
+
   for(i in 1:nrec) {
     if(!is.na(vol[i])) {
       spi = NULL
@@ -134,6 +138,7 @@ shrubspeciesfuel <- function(x, type= "total", allometric = TRUE, excludeSSP = T
       }
       if(!is.null(spi)) {
         if(allometric) {
+          eqnNames[i] = spi
           weight[i] = sp_params[spi,"a"]*vol[i]^sp_params[spi,"b"]
           vars[i] = (weight[i]^2)*sp_params[spi,"gamma_disp"]
           if(vol[i] > sp_params[spi,"maxVol"]) {
@@ -146,6 +151,7 @@ shrubspeciesfuel <- function(x, type= "total", allometric = TRUE, excludeSSP = T
             }
           }
         } else {
+          eqnNames[i] = spi
           weight[i] = sp_params[spi,"BD"]*vol[i]
           vars[i] = (sp_params[spi,"BD.sd"]^2)*vol[i]
         }
@@ -159,6 +165,7 @@ shrubspeciesfuel <- function(x, type= "total", allometric = TRUE, excludeSSP = T
         }
         if(!is.null(gri)) {
           if(allometric) {
+            eqnNames[i] = gri
             weight[i] = group_params[gri,"a"]*vol[i]^group_params[gri,"b"]
             vars[i] = (weight[i]^2)*group_params[gri,"gamma_disp"]
             if(vol[i] > group_params[gri,"maxVol"]) {
@@ -172,6 +179,7 @@ shrubspeciesfuel <- function(x, type= "total", allometric = TRUE, excludeSSP = T
             }
           }
           else {
+            eqnNames[i] = gri
             weight[i] = group_params[gri,"BD"]*vol[i]
             vars[i] = (group_params[gri,"BD.sd"]^2)*vol[i]
           }
@@ -194,14 +202,26 @@ shrubspeciesfuel <- function(x, type= "total", allometric = TRUE, excludeSSP = T
   if(agg=="plot") {
     load = tapply(load, x$plot, FUN = sum, na.rm=na.rm)
     varload = tapply(varload, x$plot, FUN = sum, na.rm=na.rm)
+    if(!var) {
+      res = load
+    } else {
+      res = data.frame(loading= load, var = varload)
+    }
   } else {
     names(load) = row.names(x)
-  }
-
-  if(!var) {
-    res = load
-  } else {
-    res = data.frame(loading= load, var = varload)
+    if(!var) {
+      if(!equationNames) {
+        res = load
+      } else {
+        res = data.frame(loading= load, equationNames = eqnNames)
+      }
+    } else {
+      if(!equationNames) {
+        res = data.frame(loading= load, var = varload)
+      } else {
+        res = data.frame(loading= load, var = varload, equationNames = eqnNames)
+      }
+    }
   }
   return(res)
 }

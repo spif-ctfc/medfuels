@@ -10,6 +10,7 @@
 #' @param type 'total'  (total fuel) or 'fine' (fine fuels)
 #' @param allometric wether to use allometric equations or bulk density estimates
 #' @param excludeSSP excludes subspecies information for species matching
+#' @param equationNames a flag to indicate that the name of species or group biomass allometry or bulk density used is desired
 #' @param var a flag to indicate that variance of estimates is desired
 #' @param agg aggregation of results. Either 'none', 'species', 'speciesplot', 'plotspecies' or 'plot'
 #' @param customParams custom allometry parameter table (for species not in default params)
@@ -38,8 +39,8 @@
 #'
 #' individualshrubfuel(x)
 
-individualshrubfuel <- function(x, type= "total",  allometric = TRUE, excludeSSP = TRUE, var = FALSE,
-                             agg = "none",  customParams = NULL, outside = "warning", na.rm = TRUE) {
+individualshrubfuel <- function(x, type= "total",  allometric = TRUE, excludeSSP = TRUE, equationNames = FALSE,
+                                var = FALSE, agg = "none",  customParams = NULL, outside = "warning", na.rm = TRUE) {
   type = match.arg(type, c("total","fine"))
   agg = match.arg(agg, c("none", "species", "plot", "plotspecies", "speciesplot"))
   x = as.data.frame(x)
@@ -77,7 +78,9 @@ individualshrubfuel <- function(x, type= "total",  allometric = TRUE, excludeSSP
 
   sp_list = row.names(sp_params)
   gr_list = row.names(group_params)
+
   nind = nrow(x)
+  eqnNames = rep(NA,nind)
   weight = rep(NA,nind)
   vars =  rep(NA,nind)
   for(i in 1:nind) {
@@ -90,6 +93,7 @@ individualshrubfuel <- function(x, type= "total",  allometric = TRUE, excludeSSP
     }
     if(!is.null(spi)) {
       if(allometric) {
+        eqnNames[i] = spi
         weight[i] = sp_params[spi,"a"]*vol[i]^sp_params[spi,"b"]
         vars[i] = (weight[i]^2)*sp_params[spi,"gamma_disp"]
         if(vol[i] > sp_params[spi,"maxVol"]) {
@@ -103,6 +107,7 @@ individualshrubfuel <- function(x, type= "total",  allometric = TRUE, excludeSSP
         }
       }
       else {
+        eqnNames[i] = spi
         weight[i] = sp_params[spi,"BD"]*vol[i]
         vars[i] = (sp_params[spi,"BD.sd"]^2)*vol[i]
       }
@@ -117,6 +122,7 @@ individualshrubfuel <- function(x, type= "total",  allometric = TRUE, excludeSSP
       }
       if(!is.null(gri)) {
         if(allometric) {
+          eqnNames[i] = gri
           weight[i] = group_params[gri,"a"]*vol[i]^group_params[gri,"b"]
           vars[i] = (weight[i]^2)*group_params[gri,"gamma_disp"]
           if(vol[i] > group_params[gri,"maxVol"]) {
@@ -130,6 +136,7 @@ individualshrubfuel <- function(x, type= "total",  allometric = TRUE, excludeSSP
           }
         }
         else {
+          eqnNames[i] = gri
           weight[i] = group_params[gri,"BD"]*vol[i]
           vars[i] = (group_params[gri,"BD.sd"]^2)*vol[i]
         }
@@ -155,7 +162,11 @@ individualshrubfuel <- function(x, type= "total",  allometric = TRUE, excludeSSP
     names(weight) = row.names(x)
   }
   if(!var) {
-    res = weight
+    if(!equationNames) {
+      res = weight
+    } else {
+      res = data.frame(biomass= weight, equationNames = eqnNames)
+    }
   } else {
     if(agg=="species") {
       vars = tapply(vars, x$species, FUN = sum, na.rm=na.rm)
@@ -174,7 +185,11 @@ individualshrubfuel <- function(x, type= "total",  allometric = TRUE, excludeSSP
       res = weight
       res$var = vars
     } else {
-      res = data.frame(biomass= weight, var = vars)
+      if(!equationNames) {
+        res = data.frame(biomass= weight, var = vars)
+      } else {
+        res = data.frame(biomass= weight, var = vars, equationNames = eqnNames)
+      }
     }
   }
   return(res)

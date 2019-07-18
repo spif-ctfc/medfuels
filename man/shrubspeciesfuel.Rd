@@ -5,8 +5,9 @@
 \title{Shrub species fuel loading}
 \usage{
 shrubspeciesfuel(x, type = "total", allometric = TRUE,
-  excludeSSP = TRUE, var = FALSE, agg = "none",
-  customParams = NULL, outside = "warning", na.rm = TRUE)
+  excludeSSP = TRUE, equationNames = FALSE, var = FALSE,
+  agg = "none", customParams = NULL, outside = "warning",
+  na.rm = TRUE)
 }
 \arguments{
 \item{x}{data frame with columns 'plot', 'species', 'H' (mean height in cm), 'C' (cover in percent). Column 'group' may be used to specify a functional group to be used when
@@ -17,6 +18,8 @@ the species has not a specific allometry (see details).}
 \item{allometric}{wether to use allometric equations or bulk density estimates}
 
 \item{excludeSSP}{excludes subspecies information for species matching}
+
+\item{equationNames}{a flag to indicate that the name of species or group allometry or bulk density used is desired}
 
 \item{var}{a flag to indicate that variance of estimates is desired}
 
